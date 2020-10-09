@@ -18,67 +18,52 @@ Java_cn_idu_ffmpeg_RSFFmpeg_prepareFFMpeg(JNIEnv *env, jclass clazz) {
     avformat_network_init();
     avfilter_register_all();
 
-    char info[40000] = {0};
     struct URLProtocol *pub = NULL;
     struct URLProtocol **p_temp = &pub;
     avio_enum_protocols(reinterpret_cast<void **>(p_temp), 0);
 
     while ((*p_temp) != NULL) {
-        sprintf(info, "%s[protocols In ][%10s]\n", info, avio_enum_protocols(
-                reinterpret_cast<void **>(p_temp), 0));
+        LOGD("[protocols In ][%10s]", avio_enum_protocols(reinterpret_cast<void **>(p_temp), 0));
     }
 
     pub = NULL;
     avio_enum_protocols((void **) p_temp, 1);
     while ((*p_temp) != NULL) {
-        sprintf(info, "%s[protocols Out][%10s]\n", info, avio_enum_protocols((void **) p_temp, 1));
+        LOGD("[protocols Out ][%10s]", avio_enum_protocols(reinterpret_cast<void **>(p_temp), 1));
     }
 
-    AVInputFormat *if_temp = av_iformat_next(NULL);
-    AVOutputFormat *of_temp = av_oformat_next(NULL);
-    //Input
-    while (if_temp != NULL) {
-        sprintf(info, "%s[AvFormat In ][%10s]\n", info, if_temp->name);
-        if_temp = if_temp->next;
-    }
-    //Output
-    while (of_temp != NULL) {
-        sprintf(info, "%s[AvFormat Out][%10s]\n", info, of_temp->name);
-        of_temp = of_temp->next;
-    }
+//    AVInputFormat *if_temp = av_iformat_next(NULL);
+//    AVOutputFormat *of_temp = av_oformat_next(NULL);
+//    //Input
+//    while (if_temp != NULL) {
+//        LOGD("[AvFormat In ][%10s]", if_temp->name);
+//        if_temp = if_temp->next;
+//    }
+//    //Output
+//    while (of_temp != NULL) {
+//        LOGD("[AvFormat Out ][%10s]", of_temp->name);
+//        of_temp = of_temp->next;
+//    }
 
 
     AVCodec *c_temp = av_codec_next(NULL);
 
     while (c_temp != NULL) {
         if (c_temp->decode != NULL) {
-            sprintf(info, "%s[AVCodec Dec]", info);
+            LOGD("[AVCodec Dec ] type:%d, %10s", c_temp->type, c_temp->name);
         } else {
-            sprintf(info, "%s[AVCodec Enc]", info);
+            LOGD("[AVCodec ENC ] type:%d, %10s", c_temp->type, c_temp->name);
         }
-        switch (c_temp->type) {
-            case AVMEDIA_TYPE_VIDEO:
-                sprintf(info, "%s[Video]", info);
-                break;
-            case AVMEDIA_TYPE_AUDIO:
-                sprintf(info, "%s[Audio]", info);
-                break;
-            default:
-                sprintf(info, "%s[Other]", info);
-                break;
-        }
-        sprintf(info, "%s[%10s]\n", info, c_temp->name);
         c_temp = c_temp->next;
     }
 
 
     AVFilter *f_temp = (AVFilter *) avfilter_next(NULL);
     while (f_temp != NULL) {
-        sprintf(info, "%s[AVFilter %10s]\n", info, f_temp->name);
+        LOGD("[AVFilter %10s]", f_temp->name);
         f_temp = f_temp->next;
     }
 
-    LOGD("%s", info);
 //    LOGD("%s", avcodec_configuration());
 }
 

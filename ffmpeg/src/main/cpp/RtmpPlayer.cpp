@@ -29,8 +29,8 @@ int RtmpPlayer::play(_JNIEnv *pEnv, _jobject *pJobject) {
     int scan_all_pmts_set = 0;
 
     AVInputFormat *avInputFormat = NULL;
-
-    avInputFormat = av_find_input_format("flv");//指定该流为flv格式
+    if (av_stristart(in_path, "rtmp", NULL))
+        avInputFormat = av_find_input_format("flv");//指定该流为flv格式
 
 //    if (!av_dict_get(format_opts, "scan_all_pmts", NULL, AV_DICT_MATCH_CASE)) {
 //        av_dict_set(&format_opts, "scan_all_pmts", "1", AV_DICT_DONT_OVERWRITE);
@@ -89,8 +89,8 @@ int RtmpPlayer::play(_JNIEnv *pEnv, _jobject *pJobject) {
 //    LOGD("av_find_best_stream: %d",best_stream);
 
     AVStream *st = ic->streams[video_index];
-    AVCodecParameters *codecpar = st->codecpar;
-    AVRational sar = av_guess_sample_aspect_ratio(ic, st, NULL);
+//    AVCodecParameters *codecpar = st->codecpar;
+//    AVRational sar = av_guess_sample_aspect_ratio(ic, st, NULL);
 
     auto decode = new H264SoftDecode(st);
 

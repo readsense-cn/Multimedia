@@ -18,7 +18,8 @@ private:
     char in_path[100];
     int ret, video_index = -1, frame_index = 0;
     int video_width, video_height;
-    AVDictionary *format_opts, *codec_opts;
+    AVDictionary *format_opts = NULL;
+    AVDictionary *codec_opts = NULL;
 
 public:
     RtmpPlayer();

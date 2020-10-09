@@ -6,15 +6,21 @@ uniform sampler2D uTexture;
 uniform sampler2D vTexture;
 uniform sampler2D uvTexture;
 
-uniform int type;
+uniform int yuvtype;
+uniform int colorType;
+uniform vec4 vColor;
 
 void main() {
+    if (colorType==1){
+        gl_FragColor = vColor;
+        return;
+    }
     float y, u, v, r, g, b;
     // We had put the Y values of each pixel to the R, G, B components by GL_LUMINANCE,
     //that's why we're pulling it from the R component, we could also use G or B
     y = texture2D(yTexture, vTexCoord).r;
 
-    if (type == 1) {
+    if (yuvtype == 1) {
         //We had put the U and V values of each pixel to the A and R,G,B components of the
         //texture respectively using GL_LUMINANCE_ALPHA. Since U,V bytes are interspread
         //in the texture

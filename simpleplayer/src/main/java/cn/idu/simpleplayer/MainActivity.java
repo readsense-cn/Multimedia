@@ -25,8 +25,8 @@ public class MainActivity extends BaseCoreActivity {
     @Override
     protected void initView() {
         yuvPreview = findViewById(R.id.yuvpreview);
-//        yuvPreview.setParams(1920, 1080, 0);
-        yuvPreview.setParams(1024, 576, 0);
+        yuvPreview.setParams(1920, 1080, 0);
+//        yuvPreview.setParams(240, 160, 0);
 //        byte[] data = ShaderUtil.readRaw(this, "yuv420p.yuv");
 //        yuvPreview.requestRenderer(data, 800, 480, 0);
 
@@ -35,17 +35,22 @@ public class MainActivity extends BaseCoreActivity {
 
         RtmpPlayer player = new RtmpPlayer();
         long code = -1;
-        code = player.init("rtmp://58.200.131.2:1935/livetv/hunantv", 320, 480);
-//        code = player.init("rtmp://192.168.1.20:1935/live/room", 320, 480);
+//        code = player.init("rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov", 320, 480);
+        code = player.init("rtmp://10.109.55.229:1935/live/room", 320, 480);
         if (code == 0) {
             ExecutorPool.exec(new Runnable() {
                 @Override
                 public void run() {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     player.play(new InfoCallback() {
                         @Override
                         public void onInfoCallback(byte[] data, int width, int height, int format) {
-//                            DLog.d("width: " + width + " height: " + height + " format:" + format);
-                            yuvPreview.requestRenderer(data, width, height, format);
+                            DLog.d("width: " + width + " height: " + height + " format:" + format);
+                            yuvPreview.requestRenderer(data, width, height, 1);
                         }
                     });
                 }

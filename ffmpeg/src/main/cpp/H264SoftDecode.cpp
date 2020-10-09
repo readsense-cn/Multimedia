@@ -67,8 +67,8 @@ void H264SoftDecode::decode(AVFrame *pFrame, AVPacket *packet, _JNIEnv *pEnv, _j
         } else {
             count++;
 //            LOGD("decode frame done: %d", count);
-//            LOGD("decode end: width:%d, height:%d, fmt:%d", pFrame->width,
-//                 pFrame->height, pFrame->format);
+            LOGD("decode end: width:%d, height:%d, fmt:%d", pFrame->width,
+                 pFrame->height, pFrame->format);
 
             LOGD("decode end: pts:%lld", pFrame->pts);
 

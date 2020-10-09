@@ -7,7 +7,6 @@ import android.opengl.Matrix;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
-import java.util.List;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -27,7 +26,7 @@ class YUVRenderer implements IRenderer {
     private int vTextureLoc = -1;
     private int uvTextureLoc = -1;
     private int matrixLoc = -1;
-    private int typeLoc = -1;
+    private int yuvtype = -1;
     private int type = -1;
 
     private float[] matrix = new float[16];
@@ -71,12 +70,15 @@ class YUVRenderer implements IRenderer {
         imageWidth = width;
         imageHeight = height;
         this.type = format;
-        if (this.yBuffer == null) {
-            allocateBuffer();
-        }
+
         if (this.yuv == null) {
             this.yuv = new byte[width * height * 3 / 2];
         }
+
+        if (this.yBuffer == null) {
+            allocateBuffer();
+        }
+
     }
 
 
@@ -95,7 +97,7 @@ class YUVRenderer implements IRenderer {
         vTextureLoc = GLES20.glGetUniformLocation(program, "vTexture");
         uvTextureLoc = GLES20.glGetUniformLocation(program, "uvTexture");
         matrixLoc = GLES20.glGetUniformLocation(program, "matrix");
-        typeLoc = GLES20.glGetUniformLocation(program, "type");
+        yuvtype = GLES20.glGetUniformLocation(program, "yuvtype");
 
 
         vertexBuffer = ByteBuffer.allocateDirect(VERTEXT.length * BYTES_PER_FLOAT)
@@ -126,7 +128,6 @@ class YUVRenderer implements IRenderer {
             uTextureId = textureObjectIds[1];
             vTextureId = textureObjectIds[2];
         }
-
     }
 
     @Override
@@ -148,20 +149,20 @@ class YUVRenderer implements IRenderer {
         vertexBuffer.position(0);
         GLES20.glEnableVertexAttribArray(positionLoc);
         GLES20.glVertexAttribPointer(
-                positionLoc, 2, GLES20.GL_FLOAT, false, 16, vertexBuffer
+                positionLoc, 2, GLES20.GL_FLOAT, false, 4 * 4, vertexBuffer
         );
 
 
         vertexBuffer.position(2);
         GLES20.glEnableVertexAttribArray(texCoordLoc);
         GLES20.glVertexAttribPointer(
-                texCoordLoc, 2, GLES20.GL_FLOAT, false, 16, vertexBuffer
+                texCoordLoc, 2, GLES20.GL_FLOAT, false, 4 * 4, vertexBuffer
         );
 
         GLES20.glUniformMatrix4fv(matrixLoc, 1, false, matrix, 0);
 
-        GLES20.glUniform1i(typeLoc, type);
-        if (yBuffer != null) {
+        GLES20.glUniform1i(yuvtype, type);
+        if (yuv != null && yBuffer != null) {
             yBuffer.put(yuv, 0, imageWidth * imageHeight);
             yBuffer.position(0);
             textureLuminance(yBuffer, imageWidth, imageHeight, yTextureId);
@@ -253,18 +254,17 @@ class YUVRenderer implements IRenderer {
 
     public void requestRenderer(byte[] data, float[] rect) {
         System.arraycopy(data, 0, this.yuv, 0, data.length);
-//        System.arraycopy(rect, 0, this.rect, 0, rect.length);
-        this.rect[0] = rect[0];
-        this.rect[1] = rect[1];
-
-        this.rect[4] = rect[0];
-        this.rect[5] = rect[3];
-
-        this.rect[6] = rect[2];
-        this.rect[7] = rect[3];
-
-        this.rect[2] = rect[2];
-        this.rect[3] = rect[1];
+//        this.rect[0] = rect[0];
+//        this.rect[1] = rect[1];
+//
+//        this.rect[4] = rect[0];
+//        this.rect[5] = rect[3];
+//
+//        this.rect[6] = rect[2];
+//        this.rect[7] = rect[3];
+//
+//        this.rect[2] = rect[2];
+//        this.rect[3] = rect[1];
         showRect = true;
     }
 
